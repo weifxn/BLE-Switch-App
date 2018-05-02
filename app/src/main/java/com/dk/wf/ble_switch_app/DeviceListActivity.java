@@ -1,4 +1,4 @@
-package com.dk.wf.ble_wallswitch;
+package com.dk.wf.ble_switch_app;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.dk.wf.ble_switch_app.R;
 
 import java.util.List;
 import java.util.Map;

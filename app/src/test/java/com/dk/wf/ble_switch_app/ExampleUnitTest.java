@@ -1,4 +1,4 @@
-package com.dk.wf.ble_wallswitch;
+package com.dk.wf.ble_switch_app;
 
 import org.junit.Test;
 

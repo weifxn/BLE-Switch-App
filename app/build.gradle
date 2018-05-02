@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.dk.wf.ble_wallswitch"
+        applicationId "com.dk.wf.ble_switch_app"
         minSdkVersion 18
         targetSdkVersion 27
         versionCode 1
