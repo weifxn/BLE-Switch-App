@@ -35,5 +35,41 @@
 	}
 ```
 
+## Assign button to scan
+1. Declare button.
 
+```java
+	private Button btnConnectDisconnect;
+```
+
+2. Bind button to xml.
+```java
+	btnConnectDisconnect = (Button) findViewById(R.id.btn_select);
+
+```
+
+3. Add click event listener.
+```java
+	btnConnectDisconnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Check if bluetooth is activated
+                if (!mBtAdapter.isEnabled()) {
+                    // An intent is an abstract description of an operation to be performed
+                    // used in start activity
+                    Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+
+                }
+                else {
+                    // If connected the button text will show "Disconnect"
+                    // If wanna auto connect, should test here when click connect it connects to SM_BT
+                    if (btnConnectDisconnect.getText().equals("Connect")){
+                        Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+                        startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+                    }
+                }
+            }
+        });
+```
  
