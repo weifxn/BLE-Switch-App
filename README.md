@@ -35,7 +35,7 @@
 	}
 ```
 
-## Assign button to scan
+## 3.0 Assign button to scan
 1. Declare button.
 
 ```java
