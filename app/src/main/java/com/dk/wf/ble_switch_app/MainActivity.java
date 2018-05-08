@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
                 }
                 else {
                     // If connected the button text will show "Disconnect"
-                    // If wanna auto connect, should test here when click connect it connects to SM_BT
+                    // If auto connect, should test here when click connect it connects to SM_BT
                     if (btnConnectDisconnect.getText().equals("Connect")){
                         Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
                         startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
