@@ -3,14 +3,18 @@
 ## 1.0 Bluetooth Adapter
 ### Allow permission for Bluetooth
 
-1. Go AndroidManifest.xml
+1. In AndroidManifest.xml, add
   
   ```html
-  <uses-sdk
-        android:minSdkVersion="18"
-        android:targetSdkVersion="18" />
+    <!-- Permission for bluetooth -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    
+    <!-- Only shows on PlayStore if device supports BLE -->
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:name="true" />
+        i
   ```
 
 
