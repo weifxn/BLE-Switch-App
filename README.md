@@ -14,7 +14,7 @@
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:name="true" />
-        i
+        
   ```
 
 
@@ -223,6 +223,7 @@
   }
   ```
 
+
 ### Display device list
 
 1. First, populate the list with `populateList`.
@@ -258,9 +259,86 @@
           setResult(Activity.RESULT_OK, result);
           finish();
       }
-  }
+  };
   ```
 
+### BLE Actions
+
+1. There are few actions when searching and connecting to BLE: 
+    - `onStart()`
+    - `onStop()`
+    - `onDestroy()`
+    - `onPause()`
+2. Add these under `OnItemClickListener`
+    
+    ```java
+    @Override
+    public void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        scanLeDevice(false);
+    }
+    ```
+3. 
+
+
+### Initialize DeviceAdapter
+
+1. `DeviceAdapter` is a class inside `DeviceListActivity` for assigning devices collected from device list.
+
+2. Create `DeviceAdapter` class under the BLE actions.
+
+    ```java
+    class DeviceAdapter extends BaseAdapter {
+        Context context;
+        List<BluetoothDevice> devices;
+        LayoutInflater inflater;
+
+        // Constructor
+        public DeviceAdapter(Context context, List<BluetoothDevice> devices) {
+            this.context = context;
+            inflater = LayoutInflater.from(context);
+            this.devices = devices;
+        }
+    }
+    ```
+3. Add the following getter in the class.
+
+    ```java
+    @Override
+    public int getCount() {
+        return devices.size();
+    }
+    
+    @Override
+    public Object getItem(int position) {
+        return devices.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+    ```
 
 
 

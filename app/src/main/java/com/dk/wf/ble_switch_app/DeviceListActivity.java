@@ -1,3 +1,11 @@
+/**
+ to-do:
+ - Auto-reconnect
+
+ changelog:
+ 1.0
+
+ **/
 package com.dk.wf.ble_switch_app;
 
 import android.app.Activity;
@@ -6,9 +14,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -169,68 +179,104 @@ public class DeviceListActivity extends Activity {
             finish();
 
         }
+
     };
 
-
-}
-
-class DeviceAdapter extends BaseAdapter {
-    Context context;
-    List<BluetoothDevice> devices;
-    LayoutInflater inflater;
-
-    // Constructor for device adapter class object
-    public DeviceAdapter(Context context, List<BluetoothDevice> devices) {
-        this.context = context;
-        inflater = LayoutInflater.from(context);
-        this.devices = devices;
-    }
-
-    // Getter
     @Override
-    public int getCount() {
-        return devices.size();
+    public void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
     }
 
     @Override
-    public Object getItem(int position) {
-        return devices.get(position);
+    public void onStop() {
+        super.onStop();
+        mBluetoothAdapter.stopLeScan(mLeScanCallback);
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
+    public void onDestroy() {
+        super.onDestroy();
+        mBluetoothAdapter.stopLeScan(mLeScanCallback);
     }
 
-
-    // Bluetooth device details
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewGroup vg;
+    protected void onPause() {
+        super.onPause();
+        scanLeDevice(false);
+    }
 
-        if(convertView != null) {
-            vg = (ViewGroup) convertView;
-        }
-        else {
-            // show on device_element, list out in the select device page
-            vg = (ViewGroup) inflater.inflate(R.layout.device_element, null);
+    // stopped here
+
+    class DeviceAdapter extends BaseAdapter {
+        Context context;
+        List<BluetoothDevice> devices;
+        LayoutInflater inflater;
+
+        // Constructor for device adapter class object
+        public DeviceAdapter(Context context, List<BluetoothDevice> devices) {
+            this.context = context;
+            inflater = LayoutInflater.from(context);
+            this.devices = devices;
         }
 
-        // collect the bluetooth device details
-        BluetoothDevice device = devices.get(position);
-        final TextView tvadd = ((TextView) vg.findViewById(R.id.address));
-        final TextView tvname = ((TextView) vg.findViewById(R.id.name));
-        final TextView tvpaired = ((TextView) vg.findViewById(R.id.paired));
-        final TextView tvrssi = ((TextView) vg.findViewById(R.id.rssi));
+        // Getter
+        @Override
+        public int getCount() {
+            return devices.size();
+        }
 
-        // RSSI section
-        tvrssi.setVisibility(View.VISIBLE);
-//        byte rssival = (byte) devRssiValues.get(device.getAddress()).intValue();
-//        if (rssival != 0) {
-//            tvrssi.setText("Rssi = " + String.valueOf(rssival));
-//        }
-        return vg;
+        @Override
+        public Object getItem(int position) {
+            return devices.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
 
 
+        // Bluetooth device details
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewGroup vg;
+
+            if(convertView != null) {
+                vg = (ViewGroup) convertView;
+            }
+            else {
+                // show on device_element, list out in the select device page
+                vg = (ViewGroup) inflater.inflate(R.layout.device_element, null);
+            }
+
+            // collect the bluetooth device details
+            BluetoothDevice device = devices.get(position);
+            final TextView tvadd = ((TextView) vg.findViewById(R.id.address));
+            final TextView tvname = ((TextView) vg.findViewById(R.id.name));
+            final TextView tvpaired = ((TextView) vg.findViewById(R.id.paired));
+            final TextView tvrssi = ((TextView) vg.findViewById(R.id.rssi));
+
+            // RSSI section
+            tvrssi.setVisibility(View.VISIBLE);
+            byte rssival = (byte) devRssiValues.get(device.getAddress()).intValue();
+            if (rssival != 0) {
+                tvrssi.setText("Rssi = " + String.valueOf(rssival));
+            }
+
+            tvname.setText(device.getName());
+            tvadd.setText(device.getAddress());
+            if (device.getBondState() == BluetoothDevice.BOND_BONDED)
+            {
+                Log.i(TAG)
+            }
+            return vg;
+
+
+        }
     }
 }
+
+
