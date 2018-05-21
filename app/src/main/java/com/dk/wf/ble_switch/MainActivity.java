@@ -1,23 +1,72 @@
+/*
+
+  To-do:
+
+  - Connect multiple device
+    > Detect total number of connected devices
+
+  - On App launch
+    > Auto connect to known device
+    > Receive lamp on/off status
+
+  - Timer
+    > Background service
+    > Appear and collapse when tap
+    > Set timer page
+    > Clock icon change color when timer added
+
+ - Disable switch when disconnected
+
+
+
+  Changelog:
+
+    1.0 Able to turn on off all LED.
+        Would not disconnect when screen is locked.
+        Changed from Nordic to Android source code.
+        Faster scan of BLE devices and higher range of scanning.
+        Auto reconnect after disconnected from device.
+        Changed from buttons to switches.
+
+    1.1 Removed switch label and replaced with button.
+        All buttons have transparent background, and gravity to left.
+        Allow user to modify switch name.
+        Pop out dialogue when user long hold to edit switch name.
+        Tap name to appear timer will can be easily implemented
+        because it is a button and only long hold is used.
+
+
+
+
+
+ */
+
 package com.dk.wf.ble_switch;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
@@ -33,6 +82,11 @@ import java.util.List;
  * Bluetooth LE API.
  */
 public class MainActivity extends Activity {
+
+    // for edit lamp name dialog
+    private Button btnEdit1, btnEdit2, btnEdit3;
+    private EditText edit;
+
     private final static String TAG = MainActivity.class.getSimpleName();
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
@@ -42,7 +96,7 @@ public class MainActivity extends Activity {
     private String mDeviceAddress;
     private ExpandableListView mGattServicesList;
     private BluetoothLeService mBluetoothLeService;
-    private Button btnOn3,btnOff3,btnOn1,btnOn2,btnOff1,btnOff2;
+    private Switch switch1,switch2,switch3;
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
             new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
     private boolean mConnected = false;
@@ -65,6 +119,7 @@ public class MainActivity extends Activity {
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             mBluetoothLeService = null;
+
         }
     };
     // Handles various events fired by the Service.
@@ -135,18 +190,47 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gatt_services_characteristics);
+
+        // For user edit lamp name dialog
+        btnEdit1 = (Button) findViewById(R.id.btnEdit1);
+        btnEdit2 = (Button) findViewById(R.id.btnEdit2);
+        btnEdit3 = (Button) findViewById(R.id.btnEdit3);
+        edit = (EditText) findViewById(R.id.edit_text);
+
+        btnEdit1.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showDialog1(edit.getText().toString());
+
+                return true;
+            }
+        });
+        btnEdit2.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showDialog2(edit.getText().toString());
+
+                return true;
+            }
+        });
+        btnEdit3.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showDialog3(edit.getText().toString());
+
+                return true;
+            }
+        });
+
         final Intent intent = getIntent();
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
         // Sets up UI references.
         ((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
         mGattServicesList = (ExpandableListView) findViewById(R.id.gatt_services_list);
-        btnOn1=(Button) findViewById(R.id.onbutton1);
-        btnOn2=(Button) findViewById(R.id.onbutton2);
-        btnOn3=(Button) findViewById(R.id.onbutton3);
-        btnOff1=(Button) findViewById(R.id.offbutton1);
-        btnOff2=(Button) findViewById(R.id.offbutton2);
-        btnOff3=(Button) findViewById(R.id.offbutton3);
+        switch1=(Switch) findViewById(R.id.switch1);
+        switch2=(Switch) findViewById(R.id.switch2);
+        switch3=(Switch) findViewById(R.id.switch3);
         mGattServicesList.setOnChildClickListener(servicesListClickListner);
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
@@ -155,120 +239,112 @@ public class MainActivity extends Activity {
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
-        btnOn1.setOnClickListener(new View.OnClickListener() {
+        switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                String message = "01";
-                byte[] value;
-                try {
-                    //send data to service
-                    value = message.getBytes("UTF-8");
-                    mBluetoothLeService.writeRXCharacteristic(value);
-                    //Update the log with time stamp
-                    String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                    //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    String message = "01";
+                    byte[] value;
+                    try {
+                        //send data to service
+                        value = message.getBytes("UTF-8");
+                        mBluetoothLeService.writeRXCharacteristic(value);
+                        //Update the log with time stamp
+                        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                        //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+                    } catch (UnsupportedEncodingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                } else {
+                    String message = "02";
+                    byte[] value;
+                    try {
+                        //send data to service
+                        value = message.getBytes("UTF-8");
+                        mBluetoothLeService.writeRXCharacteristic(value);
+                        //Update the log with time stamp
+                        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                        //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+                    } catch (UnsupportedEncodingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
-
             }
         });
-        btnOn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = "11";
-                byte[] value;
-                try {
-                    //send data to service
-                    value = message.getBytes("UTF-8");
-                    mBluetoothLeService.writeRXCharacteristic(value);
-                    //Update the log with time stamp
-                    String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                    //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
 
+        switch2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    String message = "11";
+                    byte[] value;
+                    try {
+                        //send data to service
+                        value = message.getBytes("UTF-8");
+                        mBluetoothLeService.writeRXCharacteristic(value);
+                        //Update the log with time stamp
+                        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                        //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+                    } catch (UnsupportedEncodingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                } else {
+                    String message = "12";
+                    byte[] value;
+                    try {
+                        //send data to service
+                        value = message.getBytes("UTF-8");
+                        mBluetoothLeService.writeRXCharacteristic(value);
+                        //Update the log with time stamp
+                        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                        //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+                    } catch (UnsupportedEncodingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
             }
         });
-        btnOn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = "21";
-                byte[] value;
-                try {
-                    //send data to service
-                    value = message.getBytes("UTF-8");
-                    mBluetoothLeService.writeRXCharacteristic(value);
-                    //Update the log with time stamp
-                    String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                    //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
 
+        switch3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    String message = "21";
+                    byte[] value;
+                    try {
+                        //send data to service
+                        value = message.getBytes("UTF-8");
+                        mBluetoothLeService.writeRXCharacteristic(value);
+                        //Update the log with time stamp
+                        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                        //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+                    } catch (UnsupportedEncodingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                } else {
+                    String message = "22";
+                    byte[] value;
+                    try {
+                        //send data to service
+                        value = message.getBytes("UTF-8");
+                        mBluetoothLeService.writeRXCharacteristic(value);
+                        //Update the log with time stamp
+                        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                        //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+                    } catch (UnsupportedEncodingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
             }
         });
-        btnOff1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = "02";
-                byte[] value;
-                try {
-                    //send data to service
-                    value = message.getBytes("UTF-8");
-                    mBluetoothLeService.writeRXCharacteristic(value);
-                    //Update the log with time stamp
-                    String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                    //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
 
-            }
-        });
-        btnOff2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = "12";
-                byte[] value;
-                try {
-                    //send data to service
-                    value = message.getBytes("UTF-8");
-                    mBluetoothLeService.writeRXCharacteristic(value);
-                    //Update the log with time stamp
-                    String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                    //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
 
-            }
-        });
-        btnOff3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = "22";
-                byte[] value;
-                try {
-                    //send data to service
-                    value = message.getBytes("UTF-8");
-                    mBluetoothLeService.writeRXCharacteristic(value);
-                    //Update the log with time stamp
-                    String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                    //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-            }
-        });
     }
     @Override
     protected void onResume() {
@@ -289,6 +365,60 @@ public class MainActivity extends Activity {
         super.onDestroy();
         unbindService(mServiceConnection);
         mBluetoothLeService = null;
+    }
+    private void showDialog1(String str) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Set name");
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_view, null);
+        final EditText edit_dialog = (EditText) view.findViewById(R.id.edit_dialog);
+        edit_dialog.setText(str);
+        builder.setView(view);
+        builder.setNegativeButton("cancel", null);
+        builder.setPositiveButton("confirm", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                btnEdit1.setText(edit_dialog.getText().toString());
+            }
+
+        });
+        builder.show();
+
+    }
+    private void showDialog2(String str) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Set name");
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_view, null);
+        final EditText edit_dialog = (EditText) view.findViewById(R.id.edit_dialog);
+        edit_dialog.setText(str);
+        builder.setView(view);
+        builder.setNegativeButton("cancel", null);
+        builder.setPositiveButton("confirm", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                btnEdit2.setText(edit_dialog.getText().toString());
+            }
+
+        });
+        builder.show();
+
+    }
+    private void showDialog3(String str) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Set name");
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_view, null);
+        final EditText edit_dialog = (EditText) view.findViewById(R.id.edit_dialog);
+        edit_dialog.setText(str);
+        builder.setView(view);
+        builder.setNegativeButton("cancel", null);
+        builder.setPositiveButton("confirm", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                btnEdit3.setText(edit_dialog.getText().toString());
+            }
+
+        });
+        builder.show();
+
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

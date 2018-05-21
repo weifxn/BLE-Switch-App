@@ -1,96 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp">
-    <LinearLayout android:orientation="horizontal"
+    android:layout_margin="10dp"
+    android:orientation="vertical">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
-        <TextView android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_device_address"
-            android:textSize="18sp"/>
-        <Space android:layout_width="5dp"
-            android:layout_height="wrap_content"/>
-        <TextView android:id="@+id/device_address"
+            android:textSize="18sp" />
+
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/device_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
     </LinearLayout>
-    <LinearLayout android:orientation="horizontal"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
-        <TextView android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_state"
-            android:textSize="18sp"/>
-        <Space android:layout_width="5dp"
-            android:layout_height="wrap_content"/>
-        <TextView android:id="@+id/connection_state"
+            android:textSize="18sp" />
+
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/connection_state"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/disconnected"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
     </LinearLayout>
-    <LinearLayout android:orientation="horizontal"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
-        <TextView android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_data"
-            android:textSize="18sp"/>
-        <Space android:layout_width="5dp"
-            android:layout_height="wrap_content"/>
-        <TextView android:id="@+id/data_value"
+            android:textSize="18sp" />
+
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/data_value"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/no_data"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/onbutton1"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="1: On" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/offbutton1"
+        <Button
+            android:id="@+id/btnEdit1"
+            android:layout_width="475dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="Switch 1"
+            android:gravity="left"/>
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:text=" " />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="1: Off" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/onbutton2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="2: On" />
+        <Button
+            android:id="@+id/btnEdit2"
+            android:layout_width="475dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="Switch 2"
+            android:gravity="left"/>
 
-    <Button
-        android:id="@+id/offbutton2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="2: Off" />
+        <Switch
+            android:id="@+id/switch2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:text=" " />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/onbutton3"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="3: On" />
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/offbutton3"
+        <Button
+            android:id="@+id/btnEdit3"
+            android:layout_width="475dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="Switch 3"
+            android:gravity="left"/>
+
+        <Switch
+            android:id="@+id/switch3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:text=" " />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/edit_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="3: Off" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
 
     <ExpandableListView
         android:id="@+id/gatt_services_list"
         android:layout_width="10dp"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 </LinearLayout>

@@ -83,6 +83,8 @@ public class BluetoothLeService extends Service {
         }
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            super.onServicesDiscovered(gatt, status);
+
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             } else {
@@ -226,9 +228,10 @@ public class BluetoothLeService extends Service {
     public void disconnect() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
+
             return;
         }
-//        mBluetoothGatt.disconnect();
+        mBluetoothGatt.disconnect();
     }
     /**
      * After using a given BLE device, the app must call this method to ensure resources are
