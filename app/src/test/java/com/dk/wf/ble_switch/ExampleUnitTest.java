@@ -1,4 +1,4 @@
-package com.dk.wf.ble_switch_app;
+package com.dk.wf.ble_switch;
 
 import org.junit.Test;
 
