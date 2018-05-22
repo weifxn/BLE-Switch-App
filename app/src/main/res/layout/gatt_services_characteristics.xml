@@ -89,8 +89,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="Switch 1"
-            android:gravity="center_vertical|left"/>
+            android:text="@string/switch_name"
+            android:gravity="center_vertical|start"/>
 
         <Switch
             android:id="@+id/switch1"
@@ -112,8 +112,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="Switch 2"
-            android:gravity="center_vertical|left"/>
+            android:text="@string/switch_name"
+            android:gravity="center_vertical|start"/>
 
         <Switch
             android:id="@+id/switch2"
@@ -135,8 +135,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="Switch 3"
-            android:gravity="center_vertical|left"/>
+            android:text="@string/switch_name"
+            android:gravity="center_vertical|start"/>
 
         <Switch
             android:id="@+id/switch3"
