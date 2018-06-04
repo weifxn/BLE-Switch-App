@@ -14,6 +14,8 @@
     > Appear and collapse when tap
     > Set timer page
     > Clock icon change color when timer added
+    > send time data in byte
+    > send 3 time:  current time, start time, end time.
 
  - Disable switch when disconnected
 
@@ -45,6 +47,8 @@ package com.dk.wf.ble_switch;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
@@ -68,6 +72,11 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
+
+
+// Time set import
+ import java.util.Calendar;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
@@ -81,7 +90,10 @@ import java.util.List;
  * communicates with {@code BluetoothLeService}, which in turn interacts with the
  * Bluetooth LE API.
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements TimePickerDialog.OnTimeSetListener {
+
+
+
 
     // for edit lamp name dialog
     private Button btnEdit1, btnEdit2, btnEdit3;
@@ -153,7 +165,7 @@ public class MainActivity extends Activity {
     // demonstrates 'Read' and 'Notify' features.  See
     // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
     // list of supported characteristic features.
-    private final ExpandableListView.OnChildClickListener servicesListClickListner =
+    private final ExpandableListView.OnChildClickListener servicesListClickListener =
             new ExpandableListView.OnChildClickListener() {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
@@ -191,11 +203,22 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gatt_services_characteristics);
 
+        // Time picker section
+
         // For user edit lamp name dialog
         btnEdit1 = (Button) findViewById(R.id.btnEdit1);
         btnEdit2 = (Button) findViewById(R.id.btnEdit2);
         btnEdit3 = (Button) findViewById(R.id.btnEdit3);
         edit = (EditText) findViewById(R.id.edit_text);
+        // time picker
+        Button timebutton = (Button) findViewById(R.id.btn);
+        timebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment timePicker = new TimePickerFragment();
+                timePicker.show(getFragmentManager(), "time picker");
+            }
+        });
 
         btnEdit1.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -231,7 +254,7 @@ public class MainActivity extends Activity {
         switch1=(Switch) findViewById(R.id.switch1);
         switch2=(Switch) findViewById(R.id.switch2);
         switch3=(Switch) findViewById(R.id.switch3);
-        mGattServicesList.setOnChildClickListener(servicesListClickListner);
+        mGattServicesList.setOnChildClickListener(servicesListClickListener);
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
         getActionBar().setTitle(mDeviceName);
@@ -346,6 +369,25 @@ public class MainActivity extends Activity {
 
 
     }
+
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        String time = Integer.toString(hourOfDay) + Integer.toString(minute);
+        byte[] value;
+        try {
+            //send data to service
+            value = time.getBytes("UTF-8");
+            Log.d(TAG, "Connect request result=" + time);
+            mBluetoothLeService.writeRXCharacteristic(value);
+            //Update the log with time stamp
+            String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+            //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -520,4 +562,6 @@ public class MainActivity extends Activity {
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
         return intentFilter;
     }
+
+
 }

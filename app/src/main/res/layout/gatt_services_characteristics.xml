@@ -91,6 +91,19 @@
             android:background="@android:color/transparent"
             android:text="@string/switch_name"
             android:gravity="center_vertical|start"/>
+        <TextView
+            android:id="@+id/tv"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            />
+
+        <Button
+            android:id="@+id/btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv"
+            android:onClick="onButtonClicked"
+            android:text="Set Time" />
 
         <Switch
             android:id="@+id/switch1"
@@ -99,6 +112,7 @@
             android:layout_weight="1"
             android:baselineAligned="false"
             android:text=" " />
+
     </LinearLayout>
 
     <LinearLayout
@@ -146,6 +160,8 @@
             android:baselineAligned="false"
             android:text=" " />
     </LinearLayout>
+
+
 
     <EditText
         android:id="@+id/edit_text"
