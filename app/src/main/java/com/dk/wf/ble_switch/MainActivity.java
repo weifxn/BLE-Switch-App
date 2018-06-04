@@ -115,6 +115,7 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
+    private int EndOrStart = 0;
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -211,14 +212,32 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
         btnEdit3 = (Button) findViewById(R.id.btnEdit3);
         edit = (EditText) findViewById(R.id.edit_text);
         // time picker
-        Button timebutton = (Button) findViewById(R.id.btn);
-        timebutton.setOnClickListener(new View.OnClickListener() {
+//        Button timebutton = (Button) findViewById(R.id.btn);
+        Button sTime = (Button) findViewById(R.id.startTime);
+        Button eTime = (Button) findViewById(R.id.endTime);
+        sTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DialogFragment timePicker = new TimePickerFragment();
                 timePicker.show(getFragmentManager(), "time picker");
+                EndOrStart = 1; //start
             }
         });
+        eTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment timePicker = new TimePickerFragment();
+                timePicker.show(getFragmentManager(), "time picker");
+                EndOrStart = 0; //end
+            }
+        });
+//        timebutton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                DialogFragment timePicker = new TimePickerFragment();
+//                timePicker.show(getFragmentManager(), "time picker");
+//            }
+//        });
 
         btnEdit1.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -369,16 +388,59 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
 
 
     }
+//    private TimePickerDialog.OnTimeSetListener showTimePicker = new TimePickerDialog.OnTimeSetListener() {
+//        @Override
+//        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+//            if(view.getId() == R.id.startTime) {
+//
+//            }
+//            else if(view.getId() == R.id.endTime) {
+//
+//            }
+//        }
+//    };
 
+    // thanks https://www.youtube.com/watch?v=QMwaNN_aM3U
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        String time = Integer.toString(hourOfDay) + Integer.toString(minute);
-        byte[] value;
+        TextView endTimeShow = (TextView)findViewById(R.id.endText);
+        TextView startTimeShow = (TextView)findViewById(R.id.startText);
+
+        String nowTime, endTime;
+        final Calendar c = Calendar.getInstance();
+        int nowHour = c.get(Calendar.HOUR_OF_DAY);
+        int nowMinute = c.get(Calendar.MINUTE);
+        if(hourOfDay < 10) {
+            nowTime = Integer.toString(nowHour) + Integer.toString(nowMinute);
+            endTime = "0" + Integer.toString(hourOfDay) + Integer.toString(minute);
+        } else if (nowHour < 10) {
+            nowTime = "0" + Integer.toString(nowHour) + Integer.toString(nowMinute);
+            endTime = Integer.toString(hourOfDay) + Integer.toString(minute);
+        } else if (minute < 10) {
+            nowTime = Integer.toString(nowHour) + Integer.toString(nowMinute);
+            endTime = Integer.toString(hourOfDay) + "0" + Integer.toString(minute);
+        } else if (nowMinute < 10) {
+            nowTime = Integer.toString(nowHour) + "0" + Integer.toString(nowMinute);
+            endTime = Integer.toString(hourOfDay) + Integer.toString(minute);
+        } else {
+            nowTime = Integer.toString(nowHour) + Integer.toString(nowMinute);
+            endTime = Integer.toString(hourOfDay) + Integer.toString(minute);
+        }
+        if(EndOrStart == 1){ // start
+            startTimeShow.setText(endTime);
+        } else if (EndOrStart == 0) {
+            endTimeShow.setText(endTime);
+        }
+
+
+        byte[] setTimeHex, nowTimeHex;
         try {
             //send data to service
-            value = time.getBytes("UTF-8");
-            Log.d(TAG, "Connect request result=" + time);
-            mBluetoothLeService.writeRXCharacteristic(value);
+            setTimeHex = endTime.getBytes("UTF-8");
+            nowTimeHex = nowTime.getBytes("UTF-8");
+//            Log.d(TAG, "Connect request result=" + endTime);
+            mBluetoothLeService.writeRXCharacteristic(setTimeHex);
+            mBluetoothLeService.writeRXCharacteristic(nowTimeHex);
             //Update the log with time stamp
             String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
             //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);

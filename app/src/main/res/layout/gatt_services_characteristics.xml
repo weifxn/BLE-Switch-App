@@ -85,33 +85,55 @@
 
         <Button
             android:id="@+id/btnEdit1"
-            android:layout_width="475dp"
+            android:layout_width="137dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="@string/switch_name"
-            android:gravity="center_vertical|start"/>
-        <TextView
-            android:id="@+id/tv"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            />
+            android:gravity="center_vertical|start"
+            android:text="@string/switch_name" />
+
+
+        <LinearLayout
+            android:layout_width="96dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/startText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0000" />
+
+            <TextView
+                android:id="@+id/endText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0000" />
+        </LinearLayout>
 
         <Button
-            android:id="@+id/btn"
+            android:id="@+id/startTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv"
             android:onClick="onButtonClicked"
-            android:text="Set Time" />
+            android:text="start" />
+        <Button
+            android:id="@+id/endTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onButtonClicked"
+            android:text="end" />
 
         <Switch
             android:id="@+id/switch1"
-            android:layout_width="match_parent"
+            android:layout_width="153dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:baselineAligned="false"
             android:text=" " />
+
+
 
     </LinearLayout>
 
@@ -122,12 +144,12 @@
 
         <Button
             android:id="@+id/btnEdit2"
-            android:layout_width="475dp"
+            android:layout_width="175dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="@string/switch_name"
-            android:gravity="center_vertical|start"/>
+            android:gravity="center_vertical|start"
+            android:text="@string/switch_name" />
 
         <Switch
             android:id="@+id/switch2"
@@ -145,12 +167,12 @@
 
         <Button
             android:id="@+id/btnEdit3"
-            android:layout_width="475dp"
+            android:layout_width="175dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="@string/switch_name"
-            android:gravity="center_vertical|start"/>
+            android:gravity="center_vertical|start"
+            android:text="@string/switch_name" />
 
         <Switch
             android:id="@+id/switch3"
