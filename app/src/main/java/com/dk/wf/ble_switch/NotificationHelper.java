@@ -31,7 +31,6 @@ public class NotificationHelper extends ContextWrapper {
         channel1.enableLights(true);
         channel1.enableVibration(true);
         channel1.setLightColor(R.color.colorPrimary);
-        channel1.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
 
         getManager().createNotificationChannel(channel1);
 
@@ -39,7 +38,6 @@ public class NotificationHelper extends ContextWrapper {
         channel2.enableLights(true);
         channel2.enableVibration(true);
         channel2.setLightColor(R.color.colorPrimary);
-        channel2.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
 
         getManager().createNotificationChannel(channel2);
 
@@ -56,14 +54,20 @@ public class NotificationHelper extends ContextWrapper {
         return new NotificationCompat.Builder(getApplicationContext(), channel1ID)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setSmallIcon(R.drawable.ic_one);
+                .setSmallIcon(R.drawable.ic_one)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setPriority(1)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
     }
 
     public NotificationCompat.Builder getChannel2Notification(String title, String message) {
         return new NotificationCompat.Builder(getApplicationContext(), channel2ID)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setSmallIcon(R.drawable.ic_two);
+                .setSmallIcon(R.drawable.ic_two)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setPriority(1)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
     }
 
 

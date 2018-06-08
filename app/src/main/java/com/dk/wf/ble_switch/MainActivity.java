@@ -465,8 +465,8 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
         final Calendar c = Calendar.getInstance();
         int nowHour = c.get(Calendar.HOUR_OF_DAY);
         int nowMinute = c.get(Calendar.MINUTE);
-        c.get(Calendar.HOUR_OF_DAY);
-        c.get(Calendar.MINUTE);
+        c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        c.set(Calendar.MINUTE, minute);
         c.set(Calendar.SECOND,0);
         startAlarm(c);
 
