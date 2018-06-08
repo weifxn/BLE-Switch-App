@@ -16,6 +16,8 @@
     > Clock icon change color when timer added
     > send time data in byte
     > send 3 time:  current time, start time, end time.
+    > need backend because need to store alarm. Firebase?
+    
 
  - Disable switch when disconnected
 
@@ -48,6 +50,7 @@ package com.dk.wf.ble_switch;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.Notification;
 import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
@@ -60,6 +63,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -93,7 +97,14 @@ import java.util.List;
 public class MainActivity extends Activity implements TimePickerDialog.OnTimeSetListener {
 
 
-
+//    // Notification
+//    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+//            .setSmallIcon(R.drawable.notification_icon)
+//            .setContentTitle("Test Notification")
+//            .setContentText("This is the content text of the notification")
+//            .setStyle(new NotificationCompat.BigTextStyle()
+//                .bigText("This is the content text of the notification"))
+//            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
     // for edit lamp name dialog
     private Button btnEdit1, btnEdit2, btnEdit3;
