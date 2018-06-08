@@ -17,7 +17,7 @@
     > send time data in byte
     > send 3 time:  current time, start time, end time.
     > need backend because need to store alarm. Firebase?
-    
+
 
  - Disable switch when disconnected
 
@@ -48,9 +48,11 @@
 package com.dk.wf.ble_switch;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
@@ -222,6 +224,16 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
         btnEdit2 = (Button) findViewById(R.id.btnEdit2);
         btnEdit3 = (Button) findViewById(R.id.btnEdit3);
         edit = (EditText) findViewById(R.id.edit_text);
+
+        // alarm
+        Button buttonCancelAlarm = findViewById(R.id.button_cancel);
+        buttonCancelAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelAlarm();
+            }
+        });
+
         // time picker
 //        Button timebutton = (Button) findViewById(R.id.btn);
         Button sTime = (Button) findViewById(R.id.startTime);
@@ -411,6 +423,22 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
 //        }
 //    };
 
+    private void startAlarm(Calendar c) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+    }
+
+    private void cancelAlarm() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
+
+        alarmManager.cancel(pendingIntent);
+    }
+
     // thanks https://www.youtube.com/watch?v=QMwaNN_aM3U
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -421,6 +449,13 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
         final Calendar c = Calendar.getInstance();
         int nowHour = c.get(Calendar.HOUR_OF_DAY);
         int nowMinute = c.get(Calendar.MINUTE);
+        c.get(Calendar.HOUR_OF_DAY);
+        c.get(Calendar.MINUTE);
+        c.set(Calendar.SECOND,0);
+        startAlarm(c);
+
+
+
         if(hourOfDay < 10) {
             nowTime = Integer.toString(nowHour) + Integer.toString(nowMinute);
             endTime = "0" + Integer.toString(hourOfDay) + Integer.toString(minute);
@@ -441,6 +476,7 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
             startTimeShow.setText(endTime);
         } else if (EndOrStart == 0) {
             endTimeShow.setText(endTime);
+
         }
 
 
