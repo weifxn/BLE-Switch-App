@@ -1,5 +1,6 @@
 package com.dk.wf.ble_switch;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -16,6 +17,7 @@ public class NotificationHelper extends ContextWrapper {
     public static String channel2Name = "channel2Name";
 
     private NotificationManager mManager;
+
     public NotificationHelper(Context base) {
         super(base);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -23,7 +25,7 @@ public class NotificationHelper extends ContextWrapper {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @TargetApi(Build.VERSION_CODES.O)
     public void createChannels() {
         NotificationChannel channel1 = new NotificationChannel(channel1ID, channel1Name, NotificationManager.IMPORTANCE_DEFAULT);
         channel1.enableLights(true);
@@ -31,6 +33,15 @@ public class NotificationHelper extends ContextWrapper {
         channel1.setLightColor(R.color.colorPrimary);
         channel1.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
 
+        getManager().createNotificationChannel(channel1);
+
+        NotificationChannel channel2 = new NotificationChannel(channel2ID, channel2Name, NotificationManager.IMPORTANCE_DEFAULT);
+        channel2.enableLights(true);
+        channel2.enableVibration(true);
+        channel2.setLightColor(R.color.colorPrimary);
+        channel2.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+
+        getManager().createNotificationChannel(channel2);
 
     }
 
@@ -38,7 +49,6 @@ public class NotificationHelper extends ContextWrapper {
         if (mManager == null) {
             mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         }
-
         return mManager;
     }
 
@@ -47,6 +57,13 @@ public class NotificationHelper extends ContextWrapper {
                 .setContentTitle(title)
                 .setContentText(message)
                 .setSmallIcon(R.drawable.ic_one);
+    }
+
+    public NotificationCompat.Builder getChannel2Notification(String title, String message) {
+        return new NotificationCompat.Builder(getApplicationContext(), channel2ID)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setSmallIcon(R.drawable.ic_two);
     }
 
 

@@ -107,6 +107,8 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
 //            .setStyle(new NotificationCompat.BigTextStyle()
 //                .bigText("This is the content text of the notification"))
 //            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+    //
+    private NotificationHelper mNotifiationHelper;
 
     // for edit lamp name dialog
     private Button btnEdit1, btnEdit2, btnEdit3;
@@ -212,10 +214,22 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
         mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
         mDataField.setText(R.string.no_data);
     }
+    public void sendOnChannel1(String title, String message) {
+        NotificationCompat.Builder nb = mNotifiationHelper.getChannel1Notification(title, message);
+        mNotifiationHelper.getManager().notify(1, nb.build());
+    }
+
+    public void sendOnChannel2(String title, String message) {
+        NotificationCompat.Builder nb = mNotifiationHelper.getChannel2Notification(title, message);
+        mNotifiationHelper.getManager().notify(2, nb.build());
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gatt_services_characteristics);
+
+        // noti
+        mNotifiationHelper = new NotificationHelper(this);
 
         // Time picker section
 
@@ -308,6 +322,7 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
+                    sendOnChannel1("hello","hello");
                     String message = "01";
                     byte[] value;
                     try {
@@ -343,6 +358,7 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
+                    sendOnChannel2("hello","hello");
                     String message = "11";
                     byte[] value;
                     try {
