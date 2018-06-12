@@ -187,7 +187,7 @@
         android:id="@+id/button_cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cancel" />
+        android:text="Show" />
 
     <TextView
         android:id="@+id/alarmText"

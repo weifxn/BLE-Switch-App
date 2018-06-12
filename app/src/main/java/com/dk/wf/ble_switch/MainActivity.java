@@ -2,6 +2,9 @@
 
   To-do:
 
+  - Notification
+    > Find a way to remove notification channel because it is not compatible with 4.1
+
   - Connect multiple device
     > Detect total number of connected devices
 
@@ -52,6 +55,7 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -108,7 +112,7 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
 //                .bigText("This is the content text of the notification"))
 //            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
     //
-    private NotificationHelper mNotifiationHelper;
+    private NotificationHelper mNotificationHelper;
 
     // for edit lamp name dialog
     private Button btnEdit1, btnEdit2, btnEdit3;
@@ -215,13 +219,13 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
         mDataField.setText(R.string.no_data);
     }
     public void sendOnChannel1(String title, String message) {
-        NotificationCompat.Builder nb = mNotifiationHelper.getChannel1Notification(title, message);
-        mNotifiationHelper.getManager().notify(1, nb.build());
+        NotificationCompat.Builder nb = mNotificationHelper.getChannel1Notification(title, message);
+        mNotificationHelper.getManager().notify(1, nb.build());
     }
 
     public void sendOnChannel2(String title, String message) {
-        NotificationCompat.Builder nb = mNotifiationHelper.getChannel2Notification(title, message);
-        mNotifiationHelper.getManager().notify(2, nb.build());
+        NotificationCompat.Builder nb = mNotificationHelper.getChannel2Notification(title, message);
+        mNotificationHelper.getManager().notify(2, nb.build());
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -229,7 +233,7 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
         setContentView(R.layout.gatt_services_characteristics);
 
         // noti
-        mNotifiationHelper = new NotificationHelper(this);
+        mNotificationHelper = new NotificationHelper(this);
 
         // Time picker section
 
@@ -244,12 +248,16 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
         buttonCancelAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancelAlarm();
+//                cancelAlarm();
+                addNotification();
             }
         });
 
         // time picker
 //        Button timebutton = (Button) findViewById(R.id.btn);
+        switch1=(Switch) findViewById(R.id.switch1);
+        switch2=(Switch) findViewById(R.id.switch2);
+        switch3=(Switch) findViewById(R.id.switch3);
         Button sTime = (Button) findViewById(R.id.startTime);
         Button eTime = (Button) findViewById(R.id.endTime);
         sTime.setOnClickListener(new View.OnClickListener() {
@@ -258,6 +266,7 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
                 DialogFragment timePicker = new TimePickerFragment();
                 timePicker.show(getFragmentManager(), "time picker");
                 EndOrStart = 1; //start
+                switch1.setChecked(true);
             }
         });
         eTime.setOnClickListener(new View.OnClickListener() {
@@ -307,9 +316,7 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
         // Sets up UI references.
         ((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
         mGattServicesList = (ExpandableListView) findViewById(R.id.gatt_services_list);
-        switch1=(Switch) findViewById(R.id.switch1);
-        switch2=(Switch) findViewById(R.id.switch2);
-        switch3=(Switch) findViewById(R.id.switch3);
+
         mGattServicesList.setOnChildClickListener(servicesListClickListener);
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
@@ -322,7 +329,6 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    sendOnChannel1("hello","hello");
                     String message = "01";
                     byte[] value;
                     try {
@@ -358,7 +364,6 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    sendOnChannel2("hello","hello");
                     String message = "11";
                     byte[] value;
                     try {
@@ -438,6 +443,21 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
 //            }
 //        }
 //    };
+private void addNotification() {
+    NotificationCompat.Builder builder =
+            new NotificationCompat.Builder(this)
+                    .setContentTitle("Notifications Example")
+                    .setContentText("This is a test notification");
+
+    Intent notificationIntent = new Intent(this, MainActivity.class);
+    PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT);
+    builder.setContentIntent(contentIntent);
+
+    // Add as notification
+    NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    manager.notify(0, builder.build());
+}
 
     private void startAlarm(Calendar c) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
