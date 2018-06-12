@@ -20,6 +20,8 @@
     > send time data in byte
     > send 3 time:  current time, start time, end time.
     > need backend because need to store alarm. Firebase?
+    > cancel timer button
+    > pendingIntent
 
 
  - Disable switch when disconnected
@@ -266,7 +268,6 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
                 DialogFragment timePicker = new TimePickerFragment();
                 timePicker.show(getFragmentManager(), "time picker");
                 EndOrStart = 1; //start
-                switch1.setChecked(true);
             }
         });
         eTime.setOnClickListener(new View.OnClickListener() {
