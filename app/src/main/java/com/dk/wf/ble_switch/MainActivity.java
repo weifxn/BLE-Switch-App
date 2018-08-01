@@ -81,6 +81,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -137,6 +138,7 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
     private int EndOrStart = 0;
+    String switchName[] = {"Switch 1", "Switch 2", "Switch 3"};
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -233,6 +235,10 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gatt_services_characteristics);
+
+        ListView simpleList = (ListView) findViewById(R.id.simpleListView);
+        CustomAdapter customAdapter = new CustomAdapter(getApplicationContext(), switchName);
+        simpleList.setAdapter(customAdapter);
 
         // noti
         mNotificationHelper = new NotificationHelper(this);

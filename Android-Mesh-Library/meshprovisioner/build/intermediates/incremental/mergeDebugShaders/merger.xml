@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="/Users/wf/Documents/projects/android-studio/BLE-Switch-App/Android-Mesh-Library/meshprovisioner/src/main/shaders"/></dataSet><dataSet config="debug"><source path="/Users/wf/Documents/projects/android-studio/BLE-Switch-App/Android-Mesh-Library/meshprovisioner/src/debug/shaders"/></dataSet></merger>
