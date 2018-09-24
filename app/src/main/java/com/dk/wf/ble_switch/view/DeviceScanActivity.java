@@ -1,4 +1,4 @@
-package com.dk.wf.ble_switch;
+package com.dk.wf.ble_switch.view;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
@@ -18,8 +18,11 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.dk.wf.ble_switch.R;
+
 import java.util.ArrayList;
-import java.util.UUID;
+
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
  * C4:E3:6C:7E:37:3F

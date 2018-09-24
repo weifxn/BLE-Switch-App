@@ -4,13 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-            android:id="@+id/btn"
-        android:layout_gravity="center"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+
+
+        <Button
+            android:id="@+id/textView"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:background="@android:color/transparent"
-            android:text="@string/switch_name" />
+            android:textColor="@color/colorPrimary"
+            android:layout_weight="1" />
+
+        <Switch
+            android:id="@+id/switch4"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:text="Switch" />
+    </LinearLayout>
 
 
 </LinearLayout>

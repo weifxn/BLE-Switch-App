@@ -1,11 +1,13 @@
 package com.dk.wf.ble_switch;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.dk.wf.ble_switch.R;
 
@@ -38,8 +40,9 @@ public class CustomAdapter extends BaseAdapter{
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         view = inflater.inflate(R.layout.activity_listview, null);
-        Button switchText = (Button) view.findViewById(R.id.btn);
-        switchText.setText(switchName[i]);
+        Button switchText = (Button) view.findViewById(R.id.textView);
+        switchText.setText(switchName[i] + " " + Integer.toString(i + 1));
+
         return view;
     }
 }

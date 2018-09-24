@@ -141,7 +141,7 @@ public class BluetoothLeService extends Service {
         sendBroadcast(intent);
     }
     public class LocalBinder extends Binder {
-        BluetoothLeService getService() {
+        public BluetoothLeService getService() {
             return BluetoothLeService.this;
         }
     }
@@ -158,7 +158,7 @@ public class BluetoothLeService extends Service {
         return super.onUnbind(intent);
     }
     private final IBinder mBinder = new LocalBinder();
-    /**
+    /*nd*
      * Initializes a reference to the local Bluetooth adapter.
      *
      * @return Return true if the initialization is successful.

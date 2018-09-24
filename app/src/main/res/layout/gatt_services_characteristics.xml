@@ -181,23 +181,11 @@
             android:layout_weight="1"
             android:baselineAligned="false"
             android:text=" " />
-        <ListView
-            android:id="@+id/simpleListView"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
-    <Button
-        android:id="@+id/button_cancel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Show" />
 
-    <TextView
-        android:id="@+id/alarmText"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="no alert set"/>
+
 
 
     <EditText
@@ -206,7 +194,10 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-
+    <ExpandableListView
+        android:id="@+id/lvExp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
 
     <ExpandableListView
         android:id="@+id/gatt_services_list"

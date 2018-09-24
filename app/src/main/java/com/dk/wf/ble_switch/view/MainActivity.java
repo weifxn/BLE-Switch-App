@@ -50,13 +50,12 @@
 
  */
 
-package com.dk.wf.ble_switch;
+package com.dk.wf.ble_switch.view;
 
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
@@ -77,11 +76,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -89,7 +88,15 @@ import android.widget.TimePicker;
 
 
 // Time set import
- import java.util.Calendar;
+import com.dk.wf.ble_switch.AlertReceiver;
+import com.dk.wf.ble_switch.BluetoothLeService;
+import com.dk.wf.ble_switch.ExpandableListAdapter;
+import com.dk.wf.ble_switch.NotificationHelper;
+import com.dk.wf.ble_switch.R;
+import com.dk.wf.ble_switch.SampleGattAttributes;
+import com.dk.wf.ble_switch.TimePickerFragment;
+
+import java.util.Calendar;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
@@ -138,107 +145,64 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
     private int EndOrStart = 0;
-    String switchName[] = {"Switch 1", "Switch 2", "Switch 3"};
-    // Code to manage Service lifecycle.
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+    String switchName[] = {"Switch", "Switch", "Switch"};
 
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder rawBinder) {
-            mBluetoothLeService = ((BluetoothLeService.LocalBinder) rawBinder).getService();
-            if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG, "Unable to initialize Bluetooth");
-                finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
-        }
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBluetoothLeService = null;
+    //Expandable List attributes
+    ExpandableListAdapter listAdapter;
+    ExpandableListView expListView;
+    List<String> listDataHeader;
+    HashMap<String, List<String>> listDataChild;
 
-        }
-    };
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
-    //                        or notification operations.
-    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                mConnected = true;
-                updateConnectionState(R.string.connected);
-                invalidateOptionsMenu();
-            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                mConnected = false;
-                updateConnectionState(R.string.disconnected);
-                invalidateOptionsMenu();
-                clearUI();
-            } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                // Show all the supported services and characteristics on the user interface.
-                displayGattServices(mBluetoothLeService.getSupportedGattServices());
-            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
-            }
-        }
-    };
-    // If a given GATT characteristic is selected, check for supported features.  This sample
-    // demonstrates 'Read' and 'Notify' features.  See
-    // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
-    // list of supported characteristic features.
-    private final ExpandableListView.OnChildClickListener servicesListClickListener =
-            new ExpandableListView.OnChildClickListener() {
-                @Override
-                public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
-                                            int childPosition, long id) {
-                    if (mGattCharacteristics != null) {
-                        final BluetoothGattCharacteristic characteristic =
-                                mGattCharacteristics.get(groupPosition).get(childPosition);
-                        final int charaProp = characteristic.getProperties();
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-                            // If there is an active notification on a characteristic, clear
-                            // it first so it doesn't update the data field on the user interface.
-                            if (mNotifyCharacteristic != null) {
-                                mBluetoothLeService.setCharacteristicNotification(
-                                        mNotifyCharacteristic, false);
-                                mNotifyCharacteristic = null;
-                            }
-                            mBluetoothLeService.readCharacteristic(characteristic);
-                        }
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                            mNotifyCharacteristic = characteristic;
-                            mBluetoothLeService.setCharacteristicNotification(
-                                    characteristic, true);
-                        }
-                        return true;
-                    }
-                    return false;
-                }
-            };
-    private void clearUI() {
-        mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
-        mDataField.setText(R.string.no_data);
-    }
-    public void sendOnChannel1(String title, String message) {
-        NotificationCompat.Builder nb = mNotificationHelper.getChannel1Notification(title, message);
-        mNotificationHelper.getManager().notify(1, nb.build());
-    }
-
-    public void sendOnChannel2(String title, String message) {
-        NotificationCompat.Builder nb = mNotificationHelper.getChannel2Notification(title, message);
-        mNotificationHelper.getManager().notify(2, nb.build());
-    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gatt_services_characteristics);
 
-        ListView simpleList = (ListView) findViewById(R.id.simpleListView);
-        CustomAdapter customAdapter = new CustomAdapter(getApplicationContext(), switchName);
-        simpleList.setAdapter(customAdapter);
+        //Expandable List View
+        expListView = (ExpandableListView) findViewById(R.id.lvExp);
+        prepareListData();
+        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, mBluetoothLeService);
+        expListView.setAdapter(listAdapter);
+
+        expListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if (ExpandableListView.getPackedPositionType(id) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                    int childPosition = ExpandableListView.getPackedPositionChild(id);
+
+                    // You now have everything that you would as if this was an OnChildClickListener()
+                    // Add your logic here.
+
+                    // Return true as we are handling the event.
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                String posString = Integer.toString(childPosition);
+                String message = posString + "3";
+                Log.e(TAG, message);
+                byte[] value;
+                try {
+                    //send data to service
+                    value = message.getBytes("UTF-8");
+                    mBluetoothLeService.writeRXCharacteristic(value);
+                    //Update the log with time stamp
+                    String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                    //messageListView.smoothScrollToPosition(listAdapter.getCount() - 1);
+                } catch (UnsupportedEncodingException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                return false;
+            }
+        });
 
         // noti
         mNotificationHelper = new NotificationHelper(this);
@@ -251,15 +215,7 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
         btnEdit3 = (Button) findViewById(R.id.btnEdit3);
         edit = (EditText) findViewById(R.id.edit_text);
 
-        // alarm
-        Button buttonCancelAlarm = findViewById(R.id.button_cancel);
-        buttonCancelAlarm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                cancelAlarm();
-                addNotification();
-            }
-        });
+
 
         // time picker
 //        Button timebutton = (Button) findViewById(R.id.btn);
@@ -439,6 +395,121 @@ public class MainActivity extends Activity implements TimePickerDialog.OnTimeSet
 
 
     }
+
+    private void prepareListData() {
+        listDataHeader = new ArrayList<String>();
+        listDataChild = new HashMap<String, List<String>>();
+
+        listDataHeader.add("Room 1");
+        listDataHeader.add("Room 2");
+
+        List<String> room1 = new ArrayList<String>();
+        room1.add("Switch 1");
+        room1.add("Switch 2");
+        room1.add("Switch 3");
+
+        List<String> room2 = new ArrayList<String>();
+        room2.add("Switch 1");
+        room2.add("Switch 2");
+        room2.add("Switch 3");
+
+        listDataChild.put(listDataHeader.get(0), room1);
+        listDataChild.put(listDataHeader.get(1), room2);
+    }
+
+    // Code to manage Service lifecycle.
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder rawBinder) {
+            mBluetoothLeService = ((BluetoothLeService.LocalBinder) rawBinder).getService();
+            if (!mBluetoothLeService.initialize()) {
+                Log.e(TAG, "Unable to initialize Bluetooth");
+                finish();
+            }
+            // Automatically connects to the device upon successful start-up initialization.
+            mBluetoothLeService.connect(mDeviceAddress);
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBluetoothLeService = null;
+
+        }
+    };
+    // Handles various events fired by the Service.
+    // ACTION_GATT_CONNECTED: connected to a GATT server.
+    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
+    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
+    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
+    //                        or notification operations.
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
+                mConnected = true;
+                updateConnectionState(R.string.connected);
+                invalidateOptionsMenu();
+            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                mConnected = false;
+                updateConnectionState(R.string.disconnected);
+                invalidateOptionsMenu();
+                clearUI();
+            } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+                // Show all the supported services and characteristics on the user interface.
+                displayGattServices(mBluetoothLeService.getSupportedGattServices());
+            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
+                displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+            }
+        }
+    };
+    // If a given GATT characteristic is selected, check for supported features.  This sample
+    // demonstrates 'Read' and 'Notify' features.  See
+    // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
+    // list of supported characteristic features.
+    private final ExpandableListView.OnChildClickListener servicesListClickListener =
+            new ExpandableListView.OnChildClickListener() {
+                @Override
+                public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
+                                            int childPosition, long id) {
+                    if (mGattCharacteristics != null) {
+                        final BluetoothGattCharacteristic characteristic =
+                                mGattCharacteristics.get(groupPosition).get(childPosition);
+                        final int charaProp = characteristic.getProperties();
+                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+                            // If there is an active notification on a characteristic, clear
+                            // it first so it doesn't update the data field on the user interface.
+                            if (mNotifyCharacteristic != null) {
+                                mBluetoothLeService.setCharacteristicNotification(
+                                        mNotifyCharacteristic, false);
+                                mNotifyCharacteristic = null;
+                            }
+                            mBluetoothLeService.readCharacteristic(characteristic);
+                        }
+                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                            mNotifyCharacteristic = characteristic;
+                            mBluetoothLeService.setCharacteristicNotification(
+                                    characteristic, true);
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            };
+    private void clearUI() {
+        mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
+        mDataField.setText(R.string.no_data);
+    }
+    public void sendOnChannel1(String title, String message) {
+        NotificationCompat.Builder nb = mNotificationHelper.getChannel1Notification(title, message);
+        mNotificationHelper.getManager().notify(1, nb.build());
+    }
+
+    public void sendOnChannel2(String title, String message) {
+        NotificationCompat.Builder nb = mNotificationHelper.getChannel2Notification(title, message);
+        mNotificationHelper.getManager().notify(2, nb.build());
+    }
+
 //    private TimePickerDialog.OnTimeSetListener showTimePicker = new TimePickerDialog.OnTimeSetListener() {
 //        @Override
 //        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
